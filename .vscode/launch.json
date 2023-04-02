@@ -13,6 +13,19 @@
                 "chrome",
                 "--web-port",
                 "8695",
+                // "--web-renderer",
+                // "canvaskit",
+            ]
+        },
+        {
+            "name": "tup-webrtc-2",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "-d",
+                "chrome",
+                "--web-port",
+                "8696",
                 "--web-renderer",
                 "canvaskit",
             ]
