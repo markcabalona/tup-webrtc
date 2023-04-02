@@ -1,4 +1,4 @@
-class OkadaGrid {
+class AppGrid {
   /// ```
   /// const double x2Small = 2;
   /// ```

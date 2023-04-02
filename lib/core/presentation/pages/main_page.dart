@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tuplive/core/constants/grid.dart';
 import 'package:tuplive/core/constants/routes_enum.dart';
+import 'package:tuplive/core/presentation/widgets/spacers.dart';
 
 class MainScaffold extends StatelessWidget {
   const MainScaffold({
@@ -24,9 +26,19 @@ class MainScaffold extends StatelessWidget {
                 onPressed: () {
                   GetIt.instance<GoRouter>().pushNamed(
                       Routes.liveStream.subname(Routes.home.name),
-                      params: {'id': '1'});
+                      params: {'id': 'stream'});
                 },
-                child: const Icon(Icons.live_tv_rounded),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppGrid.small),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text('Go Live'),
+                      HorizontalSpacers.small,
+                      Icon(Icons.live_tv_rounded),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
