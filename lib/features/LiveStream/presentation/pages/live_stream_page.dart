@@ -2,8 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:tuplive/features/Auth/presentation/cubit/auth_cubit.dart';
 import 'package:tuplive/features/LiveStream/presentation/bloc/livestream_bloc.dart';
 
 class LiveStreamPage extends StatefulWidget {
@@ -34,48 +36,66 @@ class _LiveStreamPageState extends State<LiveStreamPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LiveStreamBloc, LiveStreamState>(
-      bloc: GetIt.instance<LiveStreamBloc>(),
-      builder: (context, state) {
-        if (state is LiveStreamReady) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(state.roomID),
-                Container(
-                  height: 400,
-                  width: 499,
-                  color: Theme.of(context).primaryColor.withOpacity(.5),
-                  child: RTCVideoView(
-                    state.videoRenderer,
-                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                    mirror: true,
-                    placeholderBuilder: (context) {
-                      return const CircularProgressIndicator.adaptive();
-                    },
-                  ),
-                ),
-              ],
-            ),
+    return BlocListener<AuthCubit, AuthState>(
+      bloc: GetIt.instance<AuthCubit>(),
+      listener: (context, state) {
+        if (state.status == LoginStatus.success) {
+          GetIt.instance<LiveStreamBloc>().add(
+            CreateRoomEvent(user: state.user!),
           );
         }
-
-        return Center(
-          child: TextButton(
-            onPressed: () {
-              GetIt.instance<LiveStreamBloc>().add(const CreateRoomEvent());
-            },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text('Go Live'),
-                Icon(Icons.live_tv_rounded),
-              ],
-            ),
-          ),
-        );
       },
+      child: BlocBuilder<LiveStreamBloc, LiveStreamState>(
+        bloc: GetIt.instance<LiveStreamBloc>(),
+        builder: (context, state) {
+          if (state is LiveStreamReady) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(state.roomID),
+                  Container(
+                    height: 400,
+                    width: 499,
+                    color: Theme.of(context).primaryColor.withOpacity(.5),
+                    child: RTCVideoView(
+                      state.videoRenderer,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                      mirror: true,
+                      placeholderBuilder: (context) {
+                        return const CircularProgressIndicator.adaptive();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Center(
+            child: TextButton(
+              onPressed: () {
+                final authCubit = GetIt.instance<AuthCubit>();
+                if (authCubit.state.status == LoginStatus.success) {
+                  GetIt.instance<LiveStreamBloc>().add(
+                    CreateRoomEvent(user: authCubit.state.user!),
+                  );
+                } else {
+                  authCubit.login();
+                }
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text('Go Live'),
+                  Icon(Icons.live_tv_rounded),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

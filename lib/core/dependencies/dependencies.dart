@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:tuplive/core/configs/environment_configs.dart';
+import 'package:tuplive/core/dependencies/repositories/livestream_repo.dart';
 import 'package:tuplive/core/dependencies/states/states.dart';
 
 import 'router/router.dart' as router show init;
@@ -20,7 +21,7 @@ Future<void> initializeDependencies() async {
   registerSecureStorage();
   registerEnvConfigs();
   registerDioClient();
-
+  initializeRepositories();
   initializeStates();
 
   router.init();

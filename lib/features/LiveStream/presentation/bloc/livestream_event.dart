@@ -9,7 +9,10 @@ abstract class LiveStreamEvent extends Equatable {
 }
 
 class CreateRoomEvent extends LiveStreamEvent {
-  const CreateRoomEvent();
+  final User user;
+  const CreateRoomEvent({
+    required this.user,
+  });
 }
 
 class StopStreamingEvent extends LiveStreamEvent {

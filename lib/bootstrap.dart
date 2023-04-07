@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:tuplive/core/dependencies/dependencies.dart'
@@ -17,6 +19,16 @@ Future<void> bootstrap({required String envFilename}) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  if (kIsWeb || defaultTargetPlatform == TargetPlatform.macOS) {
+    // initialiaze the facebook javascript SDK
+    await FacebookAuth.instance.webAndDesktopInitialize(
+      appId: "636328618329430",
+      cookie: true,
+      xfbml: true,
+      version: "v16.0",
+    );
+  }
+
   await initializeDependencies();
 
   Animate.defaultCurve = Curves.ease;

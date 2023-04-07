@@ -47,18 +47,18 @@ class StreamListPage extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            'Streamer - ${state.configs.indexOf(e) + 1}',
-                          ),
+                          Text(e.user.name),
                           VerticalSpacers.medium,
-                          CircleAvatar(
-                            maxRadius: 40,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            child: Icon(
-                              Icons.person,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              size: 32,
+                          Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  e.user.profileImgUrl,
+                                ),
+                              ),
                             ),
                           ),
                         ],

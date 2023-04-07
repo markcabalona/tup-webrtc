@@ -2,6 +2,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:tuplive/core/dependencies/dependencies.dart'
     show serviceLocator;
 import 'package:tuplive/core/theme/cubits/theme_cubit/app_theme_cubit.dart';
+import 'package:tuplive/features/Auth/presentation/cubit/auth_cubit.dart';
 import 'package:tuplive/features/LiveStream/presentation/cubit/active_streams_cubit.dart';
 
 void initializeCubits() {
@@ -12,6 +13,10 @@ void initializeCubits() {
   );
 
   serviceLocator.registerLazySingleton<ActiveStreamsCubit>(
-    () => ActiveStreamsCubit()..getLiveStreams(),
+    () => ActiveStreamsCubit(serviceLocator())..getLiveStreams(),
+  );
+
+  serviceLocator.registerLazySingleton<AuthCubit>(
+    () => AuthCubit(),
   );
 }

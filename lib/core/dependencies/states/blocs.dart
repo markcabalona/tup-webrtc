@@ -4,6 +4,6 @@ import 'package:tuplive/features/LiveStream/presentation/bloc/livestream_bloc.da
 
 void initializeBlocs() {
   serviceLocator.registerLazySingleton<LiveStreamBloc>(
-    () => LiveStreamBloc(),
+    () => LiveStreamBloc(serviceLocator()),
   );
 }
