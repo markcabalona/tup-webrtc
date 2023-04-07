@@ -36,40 +36,43 @@ void init() {
                   appBar: AppBar(
                     actions: [
                       if (!state.params.containsValue('stream'))
-                      TextButton(
-                        onPressed: () {
-                          final url = Uri.parse('https://m.me/markcabalona.8');
+                        TextButton(
+                          onPressed: () {
+                            final url =
+                                Uri.parse('https://m.me/markcabalona.8');
 
-                          canLaunchUrl(url).then((value) {
-                            if (value) {
-                              launchUrl(
-                                url,
-                                mode: LaunchMode.externalApplication,
-                              );
-                            } else {
-                              // TODO: Show Error message
-                              launchUrl(
-                                Uri.parse('https://m.me'),
-                                mode: LaunchMode.externalApplication,
-                              );
-                            }
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppGrid.small),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Text('Message Streamer'),
-                              HorizontalSpacers.small,
-                              Icon(Icons.message_outlined),
-                            ],
+                            canLaunchUrl(url).then((value) {
+                              if (value) {
+                                launchUrl(
+                                  url,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              } else {
+                                // TODO: Show Error message
+                                launchUrl(
+                                  Uri.parse('https://m.me'),
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              }
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppGrid.small),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Text('Message Streamer'),
+                                HorizontalSpacers.small,
+                                Icon(Icons.message_outlined),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
-                  body: const LiveStreamPage(),
+                  body: LiveStreamPage(
+                    isStreamer: state.params.containsValue('stream'),
+                  ),
                 ),
               ),
             ),

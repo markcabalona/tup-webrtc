@@ -11,6 +11,8 @@ import 'package:get_it/get_it.dart';
 part 'livestream_event.dart';
 part 'livestream_state.dart';
 
+final List<RTCPeerConnection> peerConnections = [];
+
 class LiveStreamBloc extends Bloc<LiveStreamEvent, LiveStreamState> {
   LiveStreamBloc() : super(LivestreamInitial()) {
     on<CreateRoomEvent>(_createRoom);
@@ -38,9 +40,7 @@ FutureOr<void> _createRoom(
 ) async {
   final peerConnection = await _createPC();
 
-  registerPeerConnectionListeners(
-    peerConnection,
-  );
+  peerConnections.add(peerConnection);
 
   MediaStream localStream = await Helper.openCamera({
     'audio': true,
@@ -61,24 +61,49 @@ FutureOr<void> _createRoom(
   FirebaseFirestore db = FirebaseFirestore.instance;
   DocumentReference roomRef = db.collection('rooms').doc();
 
-  Map<String, dynamic> roomWithOffer = {
-    'offer': offer.toMap(),
-  };
+  Map<String, dynamic> roomWithOffer = {'offer': offer.toMap()};
+  await roomRef.set(roomWithOffer);
 
-  await roomRef.set(
-    roomWithOffer,
-  );
   peerConnection.onIceCandidate = (candidate) async {
     final iceCands = roomRef.collection('callerCandidates');
     await iceCands.add(candidate.toMap());
   };
 
-  roomRef.snapshots().listen((event) {
-    final answer = event.data();
-    if (answer is Map && (answer)['answer'] != null) {
-      peerConnection.setRemoteDescription(
-        RTCSessionDescription(answer['answer']['sdp'], 'answer'),
-      );
+  roomRef.collection('answers').snapshots().listen((snapshots) async {
+    for (var change in snapshots.docChanges) {
+      if (change.type == DocumentChangeType.added) {
+        final answer = change.doc.data();
+        if (answer?['answer'] != null) {
+          for (var element in peerConnections) {
+            if ((await element.getRemoteDescription()) == null) {
+              element.setRemoteDescription(
+                RTCSessionDescription(answer!['answer']['sdp'], 'answer'),
+              );
+              break;
+            }
+          }
+
+          // create new peer connection
+          final newPC = await _createPC();
+          peerConnections.add(newPC);
+          registerPeerConnectionListeners(
+            newPC,
+          );
+          newPC.addStream(localStream);
+          RTCSessionDescription offer = await newPC.createOffer();
+          await newPC.setLocalDescription(offer);
+
+          Map<String, dynamic> roomWithOffer = {'offer': offer.toMap()};
+          await roomRef.update(roomWithOffer);
+
+          newPC.onIceCandidate = (candidate) async {
+            for (var element
+                in (await roomRef.collection('callerCandidates').get()).docs) {
+              element.reference.update(candidate.toMap());
+            }
+          };
+        }
+      }
     }
   });
 
@@ -91,7 +116,9 @@ FutureOr<void> _createRoom(
           map['sdpMid'],
           map['sdpMLineIndex'],
         );
-        peerConnection.addCandidate(iceCand);
+        for (var element in peerConnections) {
+          element.addCandidate(iceCand);
+        }
       }
     }
   });
@@ -123,12 +150,25 @@ FutureOr<void> _stopStreaming(
 
   state.peerConnection.close();
 
-  var db = FirebaseFirestore.instance;
-  var roomRef = db.collection('rooms').doc(state.roomID);
+  if (event.isStreamer) {
+    var db = FirebaseFirestore.instance;
+    var roomRef = db.collection('rooms').doc(state.roomID);
+    for (var element in (await roomRef.collection('answers').get()).docs) {
+      element.reference.delete();
+    }
+    for (var element
+        in (await roomRef.collection('callerCandidates').get()).docs) {
+      element.reference.delete();
+    }
+    for (var element
+        in (await roomRef.collection('viewerCandidates').get()).docs) {
+      element.reference.delete();
+    }
 
-  await roomRef.delete();
+    await roomRef.delete();
 
-  state.stream.dispose();
+    state.stream.dispose();
+  }
 }
 
 void registerPeerConnectionListeners(
@@ -141,6 +181,9 @@ void registerPeerConnectionListeners(
 
   peerConnection.onConnectionState = (RTCPeerConnectionState state) {
     log('Connection state change: $state');
+    if (state == RTCPeerConnectionState.RTCPeerConnectionStateFailed) {
+      peerConnection.restartIce();
+    }
   };
 
   peerConnection.onSignalingState = (RTCSignalingState state) {
@@ -166,7 +209,8 @@ FutureOr<void> _joinRoom(
   JoinRoom event,
   Emitter<LiveStreamState> emit,
 ) async {
-  final peerConnection = await _createPC();
+  final peerConnection =
+      await _createPC(optional: {"iceTransportPolicy": "relay"});
   final renderer = RTCVideoRenderer();
   await renderer.initialize();
 
@@ -175,9 +219,7 @@ FutureOr<void> _joinRoom(
   registerPeerConnectionListeners(
     peerConnection,
     onAddStream: (stream) async {
-      log('message');
       renderer.srcObject = stream;
-      print("Add remote stream");
 
       GetIt.instance<LiveStreamBloc>().add(
         _UpdateStatus(
@@ -192,7 +234,6 @@ FutureOr<void> _joinRoom(
     },
   );
   peerConnection.onTrack = (RTCTrackEvent event) {
-    log('track edent');
     event.streams[0].getTracks().forEach((track) {
       final state = GetIt.instance<LiveStreamBloc>().state;
       if (state is LiveStreamReady) {
@@ -222,7 +263,8 @@ FutureOr<void> _joinRoom(
 
   final answer = await peerConnection.createAnswer();
   await peerConnection.setLocalDescription(answer);
-  roomRef.update({'answer': answer.toMap()});
+
+  roomRef.collection('answers').add({'answer': answer.toMap()});
 
   roomRef.collection('callerCandidates').snapshots().listen((event) {
     for (var change in event.docChanges) {
@@ -239,7 +281,7 @@ FutureOr<void> _joinRoom(
   });
 }
 
-Future<RTCPeerConnection> _createPC() async {
+Future<RTCPeerConnection> _createPC({Map<String, dynamic>? optional}) async {
   return await createPeerConnection({
     "iceServers": [
       {
@@ -261,5 +303,6 @@ Future<RTCPeerConnection> _createPC() async {
         "credential": "1ebQ26Y2VjMMzAnk",
       },
     ],
+    // if (optional != null) ...optional
   });
 }

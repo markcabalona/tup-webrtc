@@ -13,7 +13,10 @@ class CreateRoomEvent extends LiveStreamEvent {
 }
 
 class StopStreamingEvent extends LiveStreamEvent {
-  const StopStreamingEvent();
+  const StopStreamingEvent({
+    this.isStreamer = true,
+  });
+  final bool isStreamer;
 }
 
 class JoinRoom extends LiveStreamEvent {

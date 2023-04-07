@@ -9,7 +9,9 @@ import 'package:tuplive/features/LiveStream/presentation/bloc/livestream_bloc.da
 class LiveStreamPage extends StatefulWidget {
   const LiveStreamPage({
     Key? key,
+    this.isStreamer = true,
   }) : super(key: key);
+  final bool isStreamer;
 
   @override
   State<LiveStreamPage> createState() => _LiveStreamPageState();
@@ -24,8 +26,9 @@ class _LiveStreamPageState extends State<LiveStreamPage> {
   @override
   void dispose() {
     GetIt.instance<LiveStreamBloc>().add(
-      const StopStreamingEvent(),
+      StopStreamingEvent(isStreamer: widget.isStreamer),
     );
+
     super.dispose();
   }
 
