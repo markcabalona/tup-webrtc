@@ -22,7 +22,7 @@ Future<void> bootstrap({required String envFilename}) async {
   if (kIsWeb || defaultTargetPlatform == TargetPlatform.macOS) {
     // initialiaze the facebook javascript SDK
     await FacebookAuth.instance.webAndDesktopInitialize(
-      appId: "636328618329430",
+      appId: "1280532475867293",
       cookie: true,
       xfbml: true,
       version: "v16.0",

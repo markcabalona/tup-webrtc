@@ -13,8 +13,8 @@
                 "chrome",
                 "--web-port",
                 "8695",
-                // "--web-renderer",
-                // "canvaskit",
+                "--web-renderer",
+                "canvaskit",
             ]
         },
         {

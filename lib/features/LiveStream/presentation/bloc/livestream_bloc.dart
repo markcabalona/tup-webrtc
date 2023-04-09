@@ -154,10 +154,9 @@ class LiveStreamBloc extends Bloc<LiveStreamEvent, LiveStreamState> {
     }
 
     state.peerConnection.close();
-
+    var db = FirebaseFirestore.instance;
+    var roomRef = db.collection('rooms').doc(state.roomID);
     if (event.isStreamer) {
-      var db = FirebaseFirestore.instance;
-      var roomRef = db.collection('rooms').doc(state.roomID);
       for (var element in (await roomRef.collection('answers').get()).docs) {
         element.reference.delete();
       }
@@ -173,6 +172,12 @@ class LiveStreamBloc extends Bloc<LiveStreamEvent, LiveStreamState> {
       await roomRef.delete();
 
       state.stream.dispose();
+    } else {
+      final room = await roomRef.get();
+      await db.runTransaction((transaction) async {
+        final double count = room.data()?['viewers_count'] ?? 0;
+        roomRef.update({'viewers_count': count - 1});
+      });
     }
   }
 

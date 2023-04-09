@@ -9,20 +9,29 @@ class StreamConfigs extends Equatable {
   final String sdp;
   final User user;
   final RTCIceCandidate candidate;
+  final double viewersCount;
   const StreamConfigs({
     required this.roomID,
     required this.sdp,
     required this.user,
     required this.candidate,
+    required this.viewersCount,
   });
   @override
-  List<Object?> get props => [roomID, sdp];
+  List<Object?> get props => [
+        roomID,
+        sdp,
+        viewersCount,
+        user,
+        candidate,
+      ];
 
   factory StreamConfigs.fromMap(Map<String, dynamic> map) {
     return StreamConfigs(
       roomID: map['roomID'] as String,
       sdp: map['offer']['sdp'] as String,
       user: User.fromFirebase(map['user']),
+      viewersCount: map['viewers_count'] ?? 0,
       candidate: RTCIceCandidate(
         map['candidate'],
         map['sdpMid'],

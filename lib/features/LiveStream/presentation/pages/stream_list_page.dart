@@ -20,49 +20,75 @@ class StreamListPage extends StatelessWidget {
         if (state.status == StateStatus.loaded && state.configs.isNotEmpty) {
           return Wrap(
             children: [
-              ...state.configs.map((e) {
+              ...state.configs.map((stream) {
                 return Card(
                   clipBehavior: Clip.hardEdge,
-                  child: InkWell(
-                    onTap: () {
-                      GetIt.instance<LiveStreamBloc>().add(
-                        JoinRoom(
-                          sdp: e.sdp,
-                          roomID: e.roomID,
-                          candidate: e.candidate,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppGrid.large,
+                      vertical: AppGrid.medium,
+                    ),
+                    constraints: const BoxConstraints(maxWidth: 250),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Tooltip(
+                            message: stream.viewersCount > 0
+                                ? '${stream.viewersCount} ${stream.viewersCount > 1 ? 'people are' : 'person is'} watching'
+                                : 'No one is watching',
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.visibility),
+                                HorizontalSpacers.small,
+                                Text(stream.viewersCount.toString()),
+                              ],
+                            ),
+                          ),
                         ),
-                      );
-                      GetIt.instance<GoRouter>().pushNamed(
-                        Routes.liveStream.subname(Routes.home.name),
-                        params: {
-                          'id': e.roomID,
-                        },
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppGrid.large,
-                        vertical: AppGrid.medium,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(e.user.name),
-                          VerticalSpacers.medium,
-                          Container(
-                            height: 80,
-                            width: 80,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                  e.user.profileImgUrl,
-                                ),
+                        Text(stream.user.name),
+                        VerticalSpacers.medium,
+                        Container(
+                          height: 80,
+                          width: 80,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                stream.user.profileImgUrl,
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        VerticalSpacers.medium,
+                        FilledButton(
+                          onPressed: () {
+                            GetIt.instance<LiveStreamBloc>().add(
+                              JoinRoom(
+                                sdp: stream.sdp,
+                                roomID: stream.roomID,
+                                candidate: stream.candidate,
+                              ),
+                            );
+                            GetIt.instance<GoRouter>().pushNamed(
+                              Routes.liveStream.subname(Routes.home.name),
+                              params: {
+                                'id': stream.roomID,
+                              },
+                            );
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text('Watch'),
+                              HorizontalSpacers.small,
+                              Icon(Icons.tv_rounded),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
