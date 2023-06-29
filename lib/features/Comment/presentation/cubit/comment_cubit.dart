@@ -3,6 +3,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:tuplive/core/constants/enums.dart';
+import 'package:tuplive/core/dependencies/dependencies.dart';
+import 'package:tuplive/features/Auth/presentation/cubit/auth_cubit.dart';
 import 'package:tuplive/features/Comment/domain/entities/comment.dart';
 import 'package:tuplive/features/Comment/domain/repositories/comment_repository.dart';
 
@@ -40,5 +42,19 @@ class CommentCubit extends Cubit<CommentState> {
   Future<void> unsubscribeToComments({required String roomID}) async {
     await _repository.unsubscribeToCommentSection(roomID: roomID);
     emit(const CommentState());
+  }
+
+  Future<void> createComment({
+    required String roomID,
+    required String comment,
+  }) async {
+    final authCubit = serviceLocator<AuthCubit>();
+    final author = authCubit.state.user!;
+
+    await _repository.createComment(
+      author: author,
+      roomID: roomID,
+      comment: comment,
+    );
   }
 }

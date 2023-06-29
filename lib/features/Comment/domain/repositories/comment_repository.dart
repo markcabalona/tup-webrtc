@@ -11,6 +11,7 @@ abstract class CommentRepository {
 
   Future<Either<CommentFailure, Comment>> createComment({
     required User author,
+    required String roomID,
     required String comment,
   });
 
