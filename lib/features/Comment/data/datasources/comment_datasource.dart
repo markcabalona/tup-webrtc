@@ -20,7 +20,10 @@ class CommentDatasource with FirestoreHandlerMixin {
                   doc.data(),
                 ),
               )
-              .toList(),
+              .toList()
+            ..sort((a, b) =>
+                a.dateCreated.millisecondsSinceEpoch -
+                b.dateCreated.millisecondsSinceEpoch),
         );
       },
       onFailure: (error) {
