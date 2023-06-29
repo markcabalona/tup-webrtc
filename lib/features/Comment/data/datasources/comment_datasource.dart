@@ -34,6 +34,28 @@ class CommentDatasource with FirestoreHandlerMixin {
     required User author,
     required String comment,
   }) {
-    throw UnimplementedError();
+    return firestoreHandler(
+      request: () async {
+        final commentCollection =
+            firestore.collection('rooms').doc(roomID).collection('comments');
+
+        final dateCreated = DateTime.now();
+
+        commentCollection.add({
+          'author': author.toMap(),
+          'comment': comment,
+          'date_created': dateCreated.toIso8601String(),
+        });
+
+        return Comment(
+          author: author,
+          comment: comment,
+          dateCreated: dateCreated,
+        );
+      },
+      onFailure: (error) {
+        throw AppException(message: error.message);
+      },
+    );
   }
 }
