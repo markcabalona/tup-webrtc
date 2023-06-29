@@ -86,8 +86,10 @@ class _LiveStreamPageState extends State<LiveStreamPage> {
                       ],
                     ),
                   ),
-                  const Expanded(
-                    child: CommentSectionWidget(),
+                  Expanded(
+                    child: CommentSectionWidget(
+                      roomID: state.roomID,
+                    ),
                   ),
                 ],
               ),
