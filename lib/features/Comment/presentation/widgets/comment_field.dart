@@ -25,6 +25,10 @@ class _CommentFieldState extends State<CommentField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: _ctrl,
+      onFieldSubmitted: (value) {
+        widget.onSubmit(_ctrl.text);
+        _ctrl.clear();
+      },
       decoration: InputDecoration(
         hintText: 'Say something...',
         suffix: IconButton(

@@ -24,54 +24,67 @@ class CommentSectionWidget extends StatelessWidget {
           roomID: roomID,
         ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppGrid.x2Small),
-        child: BlocBuilder<CommentCubit, CommentState>(
-          builder: (context, state) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ...state.comments.map(
-                  (e) => Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ProfilePicWidget(
-                            radius: 25,
-                            imageUrl: e.author.profileImgUrl,
+        padding: const EdgeInsets.symmetric(horizontal: AppGrid.small),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: BlocBuilder<CommentCubit, CommentState>(
+                  builder: (context, state) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...state.comments.map(
+                          (e) => Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ProfilePicWidget(
+                                    radius: 25,
+                                    imageUrl: e.author.profileImgUrl,
+                                  ),
+                                  HorizontalSpacers.x2Small,
+                                  Text(
+                                    e.author.name,
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    "${e.dateCreated.toFormattedTime(format: 'hh:mm:ss')} ${e.dateCreated.hour > 11 ? 'PM' : 'AM'}",
+                                  )
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 25 + AppGrid.x2Small),
+                                child: Text(e.comment),
+                              ),
+                              VerticalSpacers.small,
+                            ],
                           ),
-                          HorizontalSpacers.x2Small,
-                          Text(
-                            e.author.name,
-                          ),
-                          const Spacer(),
-                          Text(
-                            "${e.dateCreated.toFormattedTime(format: 'hh:mm:ss')} ${e.dateCreated.hour > 11 ? 'PM' : 'AM'}",
-                          )
-                        ],
-                      ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 25 + AppGrid.x2Small),
-                        child: Text(e.comment),
-                      ),
-                      VerticalSpacers.small,
-                    ],
-                  ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-                CommentField(
+              ),
+            ),
+            Builder(
+              builder: (context) {
+                return CommentField(
                   onSubmit: (comment) {
                     BlocProvider.of<CommentCubit>(context).createComment(
                       roomID: roomID,
                       comment: comment,
                     );
                   },
-                )
-              ],
-            );
-          },
+                );
+              }
+            ),
+            VerticalSpacers.small,
+          ],
         ),
       ),
     );
