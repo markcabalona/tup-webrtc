@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
-
 class CommentField extends StatefulWidget {
   const CommentField({
     Key? key,
@@ -29,7 +28,10 @@ class _CommentFieldState extends State<CommentField> {
       decoration: InputDecoration(
         hintText: 'Say something...',
         suffix: IconButton(
-          onPressed: () => widget.onSubmit(_ctrl.text),
+          onPressed: () {
+            widget.onSubmit(_ctrl.text);
+            _ctrl.clear();
+          },
           icon: const Icon(Icons.send),
         ),
       ),
