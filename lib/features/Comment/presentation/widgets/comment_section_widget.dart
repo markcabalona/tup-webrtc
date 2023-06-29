@@ -1,12 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tuplive/core/constants/grid.dart';
 import 'package:tuplive/core/dependencies/dependencies.dart';
 import 'package:tuplive/core/presentation/widgets/profile_pic_widget.dart';
 import 'package:tuplive/core/presentation/widgets/spacers.dart';
 import 'package:tuplive/core/utils/datetime_extension.dart';
+import 'package:tuplive/features/Auth/presentation/cubit/auth_cubit.dart';
 import 'package:tuplive/features/Comment/presentation/cubit/comment_cubit.dart';
 import 'package:tuplive/features/Comment/presentation/widgets/comment_field.dart';
 
@@ -79,6 +80,17 @@ class CommentSectionWidget extends StatelessWidget {
               ),
             ),
             Builder(builder: (context) {
+              if (serviceLocator<AuthCubit>().state.user == null) {
+                return SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () {
+                      
+                    },
+                    child: const Text('Login to Comment'),
+                  ),
+                );
+              }
               return CommentField(
                 onSubmit: (comment) {
                   BlocProvider.of<CommentCubit>(context).createComment(
