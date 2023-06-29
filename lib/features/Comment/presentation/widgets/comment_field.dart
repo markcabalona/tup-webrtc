@@ -14,10 +14,12 @@ class CommentField extends StatefulWidget {
 
 class _CommentFieldState extends State<CommentField> {
   final _ctrl = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void dispose() {
     _ctrl.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -25,10 +27,13 @@ class _CommentFieldState extends State<CommentField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: _ctrl,
+      focusNode: _focusNode,
       onFieldSubmitted: (value) {
         widget.onSubmit(_ctrl.text);
         _ctrl.clear();
+        _focusNode.requestFocus();
       },
+      autofocus: true,
       decoration: InputDecoration(
         hintText: 'Say something...',
         suffix: IconButton(

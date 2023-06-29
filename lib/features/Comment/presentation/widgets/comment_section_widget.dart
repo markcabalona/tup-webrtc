@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tuplive/core/constants/grid.dart';
@@ -18,6 +19,7 @@ class CommentSectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scrollController = ScrollController();
     return BlocProvider(
       create: (context) => serviceLocator<CommentCubit>()
         ..fetchAndSubscribeToComments(
@@ -29,8 +31,13 @@ class CommentSectionWidget extends StatelessWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
+                controller: scrollController,
                 child: BlocBuilder<CommentCubit, CommentState>(
                   builder: (context, state) {
+                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                      scrollController
+                          .jumpTo(scrollController.position.maxScrollExtent);
+                    });
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -71,18 +78,16 @@ class CommentSectionWidget extends StatelessWidget {
                 ),
               ),
             ),
-            Builder(
-              builder: (context) {
-                return CommentField(
-                  onSubmit: (comment) {
-                    BlocProvider.of<CommentCubit>(context).createComment(
-                      roomID: roomID,
-                      comment: comment,
-                    );
-                  },
-                );
-              }
-            ),
+            Builder(builder: (context) {
+              return CommentField(
+                onSubmit: (comment) {
+                  BlocProvider.of<CommentCubit>(context).createComment(
+                    roomID: roomID,
+                    comment: comment,
+                  );
+                },
+              );
+            }),
             VerticalSpacers.small,
           ],
         ),
