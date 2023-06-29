@@ -9,7 +9,7 @@ class StreamConfigs extends Equatable {
   final String sdp;
   final User user;
   final RTCIceCandidate candidate;
-  final double viewersCount;
+  final int viewersCount;
   const StreamConfigs({
     required this.roomID,
     required this.sdp,

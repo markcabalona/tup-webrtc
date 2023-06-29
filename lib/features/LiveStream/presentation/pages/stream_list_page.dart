@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -8,6 +9,7 @@ import 'package:tuplive/core/constants/routes_enum.dart';
 import 'package:tuplive/core/presentation/widgets/spacers.dart';
 import 'package:tuplive/features/LiveStream/presentation/bloc/livestream_bloc.dart';
 import 'package:tuplive/features/LiveStream/presentation/cubit/active_streams_cubit.dart';
+import 'package:tuplive/features/LiveStream/presentation/widgets/viewers_count_widget.dart';
 
 class StreamListPage extends StatelessWidget {
   const StreamListPage({super.key});
@@ -34,18 +36,8 @@ class StreamListPage extends StatelessWidget {
                       children: [
                         Align(
                           alignment: Alignment.topRight,
-                          child: Tooltip(
-                            message: stream.viewersCount > 0
-                                ? '${stream.viewersCount} ${stream.viewersCount > 1 ? 'people are' : 'person is'} watching'
-                                : 'No one is watching',
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.visibility),
-                                HorizontalSpacers.small,
-                                Text(stream.viewersCount.toString()),
-                              ],
-                            ),
+                          child: ViewersCountWidget(
+                            count: stream.viewersCount,
                           ),
                         ),
                         Text(stream.user.name),
