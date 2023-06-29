@@ -295,25 +295,29 @@ class LiveStreamBloc extends Bloc<LiveStreamEvent, LiveStreamState> {
     return await createPeerConnection({
       "iceServers": [
         {
-          "urls": "stun:relay.metered.ca:80",
+          "urls": "stun:a.relay.metered.ca:80",
         },
         {
-          "urls": "turn:relay.metered.ca:80",
+          "urls": "turn:a.relay.metered.ca:80",
           "username": "914f9f688d315f61a8a49fb0",
           "credential": "1ebQ26Y2VjMMzAnk",
         },
         {
-          "urls": "turn:relay.metered.ca:443",
+          "urls": "turn:a.relay.metered.ca:80?transport=tcp",
           "username": "914f9f688d315f61a8a49fb0",
           "credential": "1ebQ26Y2VjMMzAnk",
         },
         {
-          "urls": "turn:relay.metered.ca:443?transport=tcp",
+          "urls": "turn:a.relay.metered.ca:443",
+          "username": "914f9f688d315f61a8a49fb0",
+          "credential": "1ebQ26Y2VjMMzAnk",
+        },
+        {
+          "urls": "turn:a.relay.metered.ca:443?transport=tcp",
           "username": "914f9f688d315f61a8a49fb0",
           "credential": "1ebQ26Y2VjMMzAnk",
         },
       ],
-      // if (optional != null) ...optional
     });
   }
 }
