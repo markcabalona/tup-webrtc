@@ -40,7 +40,6 @@ class CommentCubit extends Cubit<CommentState> {
   }
 
   Future<void> unsubscribeToComments({required String roomID}) async {
-    await _repository.unsubscribeToCommentSection(roomID: roomID);
     emit(const CommentState());
   }
 

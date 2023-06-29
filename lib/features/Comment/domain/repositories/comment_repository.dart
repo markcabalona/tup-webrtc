@@ -14,6 +14,4 @@ abstract class CommentRepository {
     required String roomID,
     required String comment,
   });
-
-  Future<void> unsubscribeToCommentSection({required String roomID});
 }

@@ -13,7 +13,6 @@ class CommentDatasource with FirestoreHandlerMixin {
         final commentCollection =
             firestore.collection('rooms').doc(roomID).collection('comments');
         final commentSnapshots = commentCollection.snapshots();
-
         return commentSnapshots.map(
           (snap) => snap.docs
               .map(
@@ -28,12 +27,6 @@ class CommentDatasource with FirestoreHandlerMixin {
         throw AppException(message: error.message);
       },
     );
-  }
-
-  Future<void> unsubscribeToComments({
-    required String roomID,
-  }) async {
-    throw UnimplementedError();
   }
 
   Future<Comment> createComment({

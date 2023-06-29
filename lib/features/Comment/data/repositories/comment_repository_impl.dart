@@ -49,18 +49,4 @@ class CommentRepositoryImpl
       },
     );
   }
-
-  @override
-  Future<void> unsubscribeToCommentSection({
-    required String roomID,
-  }) {
-    return this(
-      request: () {
-        return datasource.unsubscribeToComments(roomID: roomID);
-      },
-      onFailure: (message) {
-        return CommentFailure(message: message);
-      },
-    );
-  }
 }
