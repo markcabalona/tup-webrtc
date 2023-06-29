@@ -1,12 +1,23 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'comment_cubit.dart';
 
 class CommentState extends Equatable {
+  final StateStatus status;
   final List<Comment> comments;
   const CommentState({
+    this.status = StateStatus.initial,
     this.comments = const [],
   });
 
   @override
-  List<Object> get props => [comments];
+  List<Object> get props => [status, comments];
+
+  CommentState copyWith({
+    StateStatus? status,
+    List<Comment>? comments,
+  }) {
+    return CommentState(
+      status: status ?? this.status,
+      comments: comments ?? this.comments,
+    );
+  }
 }

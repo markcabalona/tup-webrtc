@@ -13,4 +13,6 @@ abstract class CommentRepository {
     required User author,
     required String comment,
   });
+
+  Future<void> unsubscribeToCommentSection({required String roomID});
 }
