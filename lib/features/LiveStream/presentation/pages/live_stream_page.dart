@@ -44,7 +44,9 @@ class _LiveStreamPageState extends State<LiveStreamPage> {
     return BlocListener<AuthCubit, AuthState>(
       bloc: GetIt.instance<AuthCubit>(),
       listener: (context, state) {
-        if (state.status == LoginStatus.success) {
+        final liveStreamState = serviceLocator<LiveStreamBloc>().state;
+        if (state.status == LoginStatus.success &&
+            liveStreamState is LivestreamInitial) {
           GetIt.instance<LiveStreamBloc>().add(
             CreateRoomEvent(user: state.user!),
           );
