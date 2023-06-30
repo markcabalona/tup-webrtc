@@ -79,27 +79,30 @@ class CommentSectionWidget extends StatelessWidget {
                 ),
               ),
             ),
-            Builder(builder: (context) {
-              if (serviceLocator<AuthCubit>().state.user == null) {
-                return SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () {
-                      
-                    },
-                    child: const Text('Login to Comment'),
-                  ),
-                );
-              }
-              return CommentField(
-                onSubmit: (comment) {
-                  BlocProvider.of<CommentCubit>(context).createComment(
-                    roomID: roomID,
-                    comment: comment,
+            BlocBuilder<AuthCubit, AuthState>(
+              bloc: serviceLocator<AuthCubit>(),
+              builder: (context, state) {
+                if (state.user == null) {
+                  return SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () {
+                        serviceLocator<AuthCubit>().login();
+                      },
+                      child: const Text('Login to Comment'),
+                    ),
                   );
-                },
-              );
-            }),
+                }
+                return CommentField(
+                  onSubmit: (comment) {
+                    BlocProvider.of<CommentCubit>(context).createComment(
+                      roomID: roomID,
+                      comment: comment,
+                    );
+                  },
+                );
+              },
+            ),
             VerticalSpacers.small,
           ],
         ),
