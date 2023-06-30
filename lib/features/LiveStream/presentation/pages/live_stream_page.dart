@@ -5,8 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:tuplive/core/constants/grid.dart';
+import 'package:tuplive/core/dependencies/dependencies.dart';
 import 'package:tuplive/features/Auth/presentation/cubit/auth_cubit.dart';
+import 'package:tuplive/features/Comment/presentation/widgets/comment_section_widget.dart';
 import 'package:tuplive/features/LiveStream/presentation/bloc/livestream_bloc.dart';
+import 'package:tuplive/features/LiveStream/presentation/cubit/active_streams_cubit.dart';
+import 'package:tuplive/features/LiveStream/presentation/widgets/viewers_count_widget.dart';
 
 class LiveStreamPage extends StatefulWidget {
   const LiveStreamPage({
@@ -50,22 +55,40 @@ class _LiveStreamPageState extends State<LiveStreamPage> {
         builder: (context, state) {
           if (state is LiveStreamReady) {
             return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              child: Row(
                 children: [
-                  Text(state.roomID),
-                  Container(
-                    height: 400,
-                    width: 499,
-                    color: Theme.of(context).primaryColor.withOpacity(.5),
-                    child: RTCVideoView(
-                      state.videoRenderer,
-                      objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                      mirror: true,
-                      placeholderBuilder: (context) {
-                        return const CircularProgressIndicator.adaptive();
-                      },
+                  Expanded(
+                    flex: 3,
+                    child: Stack(
+                      children: [
+                        Container(
+                          color: Theme.of(context).primaryColor.withOpacity(.5),
+                          child: RTCVideoView(
+                            state.videoRenderer,
+                            objectFit: RTCVideoViewObjectFit
+                                .RTCVideoViewObjectFitContain,
+                            mirror: true,
+                            placeholderBuilder: (context) {
+                              return const CircularProgressIndicator.adaptive();
+                            },
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: AppGrid.small,
+                              right: AppGrid.small,
+                            ),
+                            child: _buildViewersCount(state.roomID),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: CommentSectionWidget(
+                      roomID: state.roomID,
                     ),
                   ),
                 ],
@@ -96,6 +119,26 @@ class _LiveStreamPageState extends State<LiveStreamPage> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildViewersCount(
+    String roomID,
+  ) {
+    return BlocSelector<ActiveStreamsCubit, ActiveStreamsState, int>(
+      bloc: serviceLocator<ActiveStreamsCubit>(),
+      selector: (state) {
+        return state.configs
+            .firstWhere(
+              (config) => roomID == config.roomID,
+            )
+            .viewersCount;
+      },
+      builder: (context, viewersCount) {
+        return ViewersCountWidget(
+          count: viewersCount,
+        );
+      },
     );
   }
 }

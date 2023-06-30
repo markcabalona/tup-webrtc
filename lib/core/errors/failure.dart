@@ -7,5 +7,9 @@ abstract class Failure {
 }
 
 class LiveStreamFailure extends Failure {
-  LiveStreamFailure({super.message});
+  const LiveStreamFailure({super.message});
+}
+
+class CommentFailure extends Failure {
+  const CommentFailure({super.message});
 }

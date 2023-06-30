@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tuplive/core/constants/enums.dart';
 import 'package:tuplive/core/constants/grid.dart';
 import 'package:tuplive/core/constants/routes_enum.dart';
+import 'package:tuplive/core/presentation/widgets/profile_pic_widget.dart';
 import 'package:tuplive/core/presentation/widgets/spacers.dart';
 import 'package:tuplive/features/LiveStream/presentation/bloc/livestream_bloc.dart';
 import 'package:tuplive/features/LiveStream/presentation/cubit/active_streams_cubit.dart';
@@ -42,17 +43,9 @@ class StreamListPage extends StatelessWidget {
                         ),
                         Text(stream.user.name),
                         VerticalSpacers.medium,
-                        Container(
-                          height: 80,
-                          width: 80,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(100),
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                stream.user.profileImgUrl,
-                              ),
-                            ),
-                          ),
+                        ProfilePicWidget(
+                          imageUrl: stream.user.profileImgUrl,
+                          radius: 80,
                         ),
                         VerticalSpacers.medium,
                         FilledButton(
